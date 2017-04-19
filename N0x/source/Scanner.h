@@ -232,7 +232,7 @@ private:
 		auto it = keywords.find(text);
 		TokenType type = IDENTIFIER;
 		if (it != keywords.end()) type = keywords.at(text);
-		addToken(type);
+		addToken(type, StringLiteral(text));
 	}
 
 	// Parses a string

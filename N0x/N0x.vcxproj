@@ -119,6 +119,10 @@
   <ItemGroup>
     <ClInclude Include="source\Scanner.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\main.nox" />
+    <None Include="source\grammar.cfg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
