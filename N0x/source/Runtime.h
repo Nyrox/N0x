@@ -5,6 +5,7 @@
 #include <array>
 
 class Expr;
+class Runtime;
 
 class Block {
 public:
@@ -37,13 +38,9 @@ class Runtime {
 public:
 	friend class Interpreter;
 
-	enum class Registers : std::size_t { RETURN, EAX };
+	enum class Registers : std::size_t { RETURN, EAX, EBX, ECX, EDX, EEX, EFX };
 
 	int& getRegister(Registers i) { return registers[(std::size_t)i]; }
-	void execute() {
-		functions["main"].execute(*this);
-	}
-
 	void call(std::string t_identifier) {
 		functions[t_identifier].execute(*this);
 	}
@@ -52,11 +49,8 @@ public:
 		registers[(std::size_t)r] = val;
 	}
 
-	
-protected:
-	
 
-private:	
+private:
 	uptr<Expr> entryPoint = nullptr;
 	std::array<int, 8> registers;
 	std::unordered_map<std::string, Block> functions;

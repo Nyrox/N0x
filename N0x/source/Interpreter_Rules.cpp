@@ -13,7 +13,6 @@ void Interpreter::program() {
 		funcdecl();
 	}
 
-	if (runtime.functions.find("main") == runtime.functions.end()) throw ParsingError("No entry point could be found.");
 }
 
 void Interpreter::funcdecl() {

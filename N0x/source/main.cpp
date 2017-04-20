@@ -10,7 +10,8 @@ int main() {
 	Runtime runtime;
 	Interpreter interpreter(runtime, scanner.scanTokens());
 	interpreter.parse();
-	runtime.execute();
+
+	runtime.call("main");
 
 	std::cin.get();
 }
