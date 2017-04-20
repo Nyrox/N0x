@@ -1,6 +1,7 @@
 #include <Scanner.h>
 #include <expressions/expr.h>
 #include <core/Definitions.h>
+#include <Runtime.h>
 
 class ParsingError : public std::exception {
 public:
@@ -17,16 +18,17 @@ public:
 
 class Interpreter {
 public:
-	Interpreter(std::vector<Token> t_tokens);
+	Interpreter(Runtime& runtime, std::vector<Token> t_tokens);
 
-	
-	uptr<Program> parse();
+	// Parses a token sequence and loads it into a runtime
+	void parse();
 
 	std::vector<Token> tokens;
 private:
 	int start = 0;
 	int current = 0;
-	
+	Runtime& runtime; 
+
 	// Rules making up the grammar
 
 	// An expression representing a single l- or rvalue
@@ -37,16 +39,16 @@ private:
 	uptr<Expr> expr();
 	uptr<Expr> identifier();
 	// Temporary instruction to print the following expression
-	uptr<Expr> print();
+
 	// Declares a variable
 	uptr<Expr> vardecl();
 	// Calls a function
 	uptr<Expr> funccall();
-	// Declares a function
-	uptr<Expr> funcdecl();
-	// Main entry rule
-	uptr<Program> program();
 
+	uptr<Unary> print();
+	void funcdecl();
+	void program();
+	Block block();
 
 	// Utility functions
 	Token peek() {

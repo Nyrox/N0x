@@ -1,105 +1,53 @@
 #include "Interpreter.h"
 
-Interpreter::Interpreter(std::vector<Token> t_tokens) : tokens(t_tokens) { }
+Interpreter::Interpreter(Runtime& t_runtime, std::vector<Token> t_tokens) : runtime(t_runtime), tokens(t_tokens) { }
 
-uptr<Program> Interpreter::parse() {
-	return std::move(program());
+void Interpreter::parse() {
+	program();
 }
 
-uptr<Program> Interpreter::program() {
-	auto program = make_unique<Program>();
 
+
+void Interpreter::program() {
 	while (!endIsReached()) {
-		Token token = peek();
-
-		switch (token.type) {
-		case TokenType::PRINT:
-			program->expressions.push_back(std::move(print()));
-			break;
-		case TokenType::VAR:
-			program->expressions.push_back(std::move(vardecl()));
-			break;
-		case TokenType::FUNC:
-			program->expressions.push_back(std::move(funcdecl()));
-			break;
-		case TokenType::IDENTIFIER:
-			program->expressions.push_back(std::move(expr()));
-			break;
-		default:
-			throw ParsingError("Unexpected token: " + token.lexeme);
-		}
+		funcdecl();
 	}
 
-	return std::move(program);
+	if (runtime.functions.find("main") == runtime.functions.end()) throw ParsingError("No entry point could be found.");
 }
 
-uptr<Expr> Interpreter::print() {
-	Token token = advance(PRINT);
-	auto node = expr();
-
-	return make_unique<UnaryExpr>(token, std::move(node));
-}
-
-uptr<Expr> Interpreter::funcdecl() {
+void Interpreter::funcdecl() {
 	Token token = advance(FUNC);
 	Token identifier = advance(IDENTIFIER);
 
 	advance(LEFT_PAREN);
 	advance(RIGHT_PAREN);
-	advance(LEFT_BRACE);
 
-	uptr<FuncDeclExpr> func = make_unique<FuncDeclExpr>(token, std::get<StringLiteral>(*identifier.literal).string);
+	runtime.functions[std::get<StringLiteral>(*identifier.literal).string] = std::move(block());
+}
+
+Block Interpreter::block() {
+	Token brace = advance(LEFT_BRACE);
+	Block out;
 
 	while (!endIsReached() && !match(RIGHT_BRACE)) {
-		Token token = peek();
-
-		switch (token.type) {
-		case TokenType::VAR:
-			func->expressions.push_back(std::move(vardecl()));
+		switch (peek().type) {
+		case VAR:
+			out.expressions.push_back(vardecl());
 			break;
-		case TokenType::PRINT:
-			func->expressions.push_back(std::move(print()));
+		case PRINT:
+			out.expressions.push_back(print());
 			break;
-		case TokenType::IDENTIFIER:
-			func->expressions.push_back(std::move(expr()));
+		case IDENTIFIER:
+			out.expressions.push_back(expr());
 			break;
 		default:
-			throw ParsingError("Unexpected token: " + token.lexeme);
+			throw ParsingError("Unexpected symbol: " + peek().lexeme);
 		}
 	}
 
 	advance(RIGHT_BRACE);
-
-	return func;
-}
-
-uptr<Expr> Interpreter::funccall() {
-	Token token = advance(IDENTIFIER);
-
-	advance(LEFT_PAREN);
-	advance(RIGHT_PAREN);
-
-	return make_unique<FuncCallExpr>(token, std::get<StringLiteral>(*token.literal).string);
-}
-
-uptr<Expr> Interpreter::vardecl() {
-	Token token = advance(VAR);
-
-	if (!match(IDENTIFIER)) { throw ParsingError("Expected identifier. Found: " + getCurrent().lexeme); }
-	auto node = std::get<StringLiteral>(*advance().literal).string;
-
-	uptr<Expr> initializer = nullptr;
-	if (match({ EQUAL })) {
-		advance();
-		initializer = expr();
-	}
-
-	return make_unique<VarDeclExpr>(token, std::move(node), std::move(initializer));
-}
-
-uptr<Expr> Interpreter::identifier() {
-	Token token = advance(IDENTIFIER);
-	return make_unique<IdentifierExpr>(token);
+	return out;
 }
 
 uptr<Expr> Interpreter::expr() {
@@ -107,7 +55,7 @@ uptr<Expr> Interpreter::expr() {
 
 	while (match({ PLUS, MINUS })) {
 		Token token = advance();
-		node = make_unique<BinaryExpr>(std::move(node), token, std::move(term()));
+		node = make_unique<Binary>(std::move(node), token, std::move(term()));
 		if (endIsReached()) { return node; }
 	}
 
@@ -119,7 +67,7 @@ uptr<Expr> Interpreter::term() {
 
 	while (match({ STAR, SLASH })) {
 		Token token = advance();
-		node = make_unique<BinaryExpr>(std::move(node), token, std::move(factor()));
+		node = make_unique<Binary>(std::move(node), token, std::move(factor()));
 		if (endIsReached()) return node;
 	}
 
@@ -129,7 +77,7 @@ uptr<Expr> Interpreter::term() {
 uptr<Expr> Interpreter::factor() {
 	if (match({ INT })) {
 		Token token = advance(INT);
-		return make_unique<NumericExpr>(token, std::get<IntegerLiteral>(*token.literal).value);
+		return make_unique<Constant>(std::get<IntegerLiteral>(*token.literal).value);
 	}
 	else if (match({ LEFT_PAREN })) {
 		advance(LEFT_PAREN);
@@ -139,7 +87,7 @@ uptr<Expr> Interpreter::factor() {
 	}
 	else if (match({ PLUS, MINUS })) {
 		Token token = advance({ PLUS, MINUS });
-		return make_unique<UnaryExpr>(token, std::move(factor()));
+		return make_unique<Unary>(token, std::move(factor()));
 	}
 	else if (match(IDENTIFIER)) {
 		if (peekNext().type == LEFT_PAREN) {
@@ -147,10 +95,49 @@ uptr<Expr> Interpreter::factor() {
 		}
 		else {
 			Token token = advance(IDENTIFIER);
-			return make_unique<IdentifierExpr>(token);
+			return make_unique<Variable>(std::get<StringLiteral>(*token.literal).string);
 		}
 	}
 	else {
 		throw ParsingError("Expected factor, found: " + getCurrent().lexeme);
 	}
 }
+
+uptr<Unary> Interpreter::print() {
+	Token token = advance(PRINT);
+
+	return make_unique<Unary>(token, expr());
+}
+
+uptr<Expr> Interpreter::funccall() {
+	Token token = advance(IDENTIFIER);
+
+	advance(LEFT_PAREN);
+	advance(RIGHT_PAREN);
+
+	return make_unique<FuncCall>(std::get<StringLiteral>(*token.literal).string);
+}
+
+uptr<Expr> Interpreter::vardecl() {
+	Token token = advance(VAR);
+
+	if (!match(IDENTIFIER)) { throw ParsingError("Expected identifier. Found: " + getCurrent().lexeme); }
+	auto identifier = std::get<StringLiteral>(*advance().literal).string;
+
+	uptr<Expr> initializer = nullptr;
+	if (match({ EQUAL })) {
+		advance();
+		initializer = expr();
+	}
+
+	return make_unique<VarDecl>(identifier, std::move(initializer));
+}
+
+uptr<Expr> Interpreter::identifier() {
+	Token token = advance(IDENTIFIER);
+	return make_unique<Variable>(std::get<StringLiteral>(*token.literal).string);
+}
+
+
+
+

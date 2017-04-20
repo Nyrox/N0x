@@ -4,3 +4,4 @@ Debug/
 N0x/Release/
 Release/N0x.iobj
 Release/
+*.vcxproj

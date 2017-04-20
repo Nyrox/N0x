@@ -2,8 +2,9 @@ func foo() {
     print 5
 }
 
-var x = 5
-var y = (x * 4 + 5)
-print x + (2 * 7) * y
-
-foo()
+func main() {
+    var x = 5
+    var y = (x * 4 + 5)
+    print x + (2 * 7) * y
+    foo()
+}
