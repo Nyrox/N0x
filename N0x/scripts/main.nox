@@ -1,5 +1,6 @@
 func foo() {
-    print 5
+    var y = 7
+    print z
 }
 
 func main() {
@@ -7,4 +8,5 @@ func main() {
     var y = (x * 4 + 5)
     print x + (2 * 7) * y
     foo()
+    cpp()
 }

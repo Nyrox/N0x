@@ -41,6 +41,9 @@
     <ClInclude Include="source\Runtime.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\FunctionDispatch.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\main.nox" />

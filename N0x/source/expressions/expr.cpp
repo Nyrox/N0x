@@ -2,13 +2,13 @@
 #include <Runtime.h>
 
 /* Var Decl */
-VarDecl::VarDecl(std::string t_identifier, std::unique_ptr<Expr>&& init) : identifier(t_identifier), initializer(std::move(init)) {
+VarDecl::VarDecl(std::string t_identifier, uint32 t_sfo, std::unique_ptr<Expr>&& init) : stackFrameOffset(t_sfo), identifier(t_identifier), initializer(std::move(init)) {
 
 }
 
 void VarDecl::eval(Runtime& runtime, Block& scope) {
 	initializer->eval(runtime, scope);
-	scope.defineVariable(identifier, runtime.getRegister(Runtime::Registers::RETURN));
+	runtime.push(runtime.getRegister(Runtime::Registers::RETURN));
 }
 
 
@@ -18,17 +18,19 @@ FuncCall::FuncCall(std::string t_identifier) : identifier(t_identifier) {
 }
 
 void FuncCall::eval(Runtime& runtime, Block& block) {
+	runtime.pushStackFrame();
 	runtime.call(identifier);
+	runtime.popStackFrame();
 }
 
 
 /* Variable */
-Variable::Variable(std::string t_identifier) : identifier(t_identifier) {
+Variable::Variable(std::string t_identifier, uint32 t_sfo) : stackFrameOffset(t_sfo), identifier(t_identifier) {
 
 }
 
 void Variable::eval(Runtime& runtime, Block& block) {
-	runtime.mov(block.getVariable(identifier), Runtime::Registers::RETURN);
+	runtime.mov(runtime.getFromCurrentStackFrame<int>(stackFrameOffset), Runtime::Registers::RETURN);
 }
 
 
@@ -37,6 +39,7 @@ Unary::Unary(Token& t_token, uptr<Expr>&& t_operand) : token(t_token), operand(s
 
 }
 
+
 void Unary::eval(Runtime& runtime, Block& scope) {
 	operand->eval(runtime, scope);
 	int value = runtime.getRegister(Runtime::Registers::RETURN);
@@ -44,6 +47,9 @@ void Unary::eval(Runtime& runtime, Block& scope) {
 	if (token.type == MINUS) value = -value;
 	else if (token.type == PLUS) value = +value;
 	else if (token.type == PRINT) {
+		#ifdef _DEBUG
+			std::cout << "Print: ";
+		#endif
 		std::cout << std::to_string(value) << "\n";
 	}
 	else throw std::exception();

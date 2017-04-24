@@ -2,6 +2,7 @@
 #include <expressions/expr.h>
 #include <core/Definitions.h>
 #include <Runtime.h>
+#include <stack>
 
 class ParsingError : public std::exception {
 public:
@@ -25,6 +26,9 @@ public:
 
 	std::vector<Token> tokens;
 private:
+	uint32 currentStackFrameOffset = 0;
+	std::stack<std::unordered_map<std::string, uint32>> symbolTable; 
+
 	int start = 0;
 	int current = 0;
 	Runtime& runtime; 
