@@ -1,7 +1,7 @@
 #include "Interpreter.h"
-#include <Runtime.h>
 
-Interpreter::Interpreter(Runtime& t_runtime, std::vector<Token> t_tokens) : runtime(t_runtime), tokens(t_tokens) { }
+Interpreter::Interpreter(Runtime& t_runtime, std::vector<Token> t_tokens) : runtime(t_runtime), tokens(t_tokens) { 
+}
 
 void Interpreter::parse() {
 	program();
@@ -23,30 +23,13 @@ void Interpreter::funcdecl() {
 	advance(LEFT_PAREN);
 	advance(RIGHT_PAREN);
 
+	symbolTable.push({ });
+	uint32 old = currentStackFrameOffset;
+	currentStackFrameOffset = 0;
+
 	runtime.functions[std::get<StringLiteral>(*identifier.literal).string] = std::move(block());
-}
 
-uptr<Expr> Interpreter::condition() {
-	advance(IF);
-
-	advance(LEFT_PAREN);
-	auto c = expr();
-	advance(RIGHT_PAREN);
-	auto b = block();
-
-	uptr<Expr> alternate = nullptr;
-	if (match(ELSE)) {
-		advance(ELSE);
-
-		if (match(IF)) {
-			alternate = condition();
-		}
-		else {
-			alternate = make_unique<BlockExpr>(block());
-		}
-	}
-
-	return make_unique<Condition>(std::move(c), std::move(b), std::move(alternate));
+	currentStackFrameOffset = old;
 }
 
 Block Interpreter::block() {
@@ -63,9 +46,6 @@ Block Interpreter::block() {
 			break;
 		case IDENTIFIER:
 			out.expressions.push_back(expr());
-			break;
-		case IF:
-			out.expressions.push_back(condition());
 			break;
 		default:
 			throw ParsingError("Unexpected symbol: " + peek().lexeme);
@@ -121,7 +101,8 @@ uptr<Expr> Interpreter::factor() {
 		}
 		else {
 			Token token = advance(IDENTIFIER);
-			return make_unique<Variable>(std::get<StringLiteral>(*token.literal).string);
+			std::string identifier = std::get<StringLiteral>(*token.literal).string;
+			return make_unique<Variable>(identifier, symbolTable.top()[identifier]);
 		}
 	}
 	else {
@@ -156,8 +137,12 @@ uptr<Expr> Interpreter::vardecl() {
 		initializer = expr();
 	}
 
-	return make_unique<VarDecl>(identifier, std::move(initializer));
+	symbolTable.top()[identifier] = currentStackFrameOffset;
+	currentStackFrameOffset += sizeof(int);
+
+	return make_unique<VarDecl>(identifier, currentStackFrameOffset - sizeof(int), std::move(initializer));
 }
+
 
 
 

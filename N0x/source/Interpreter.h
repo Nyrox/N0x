@@ -1,8 +1,8 @@
 #include <Scanner.h>
 #include <expressions/expr.h>
 #include <core/Definitions.h>
-class Runtime;
-
+#include <Runtime.h>
+#include <stack>
 
 class ParsingError : public std::exception {
 public:
@@ -26,6 +26,9 @@ public:
 
 	std::vector<Token> tokens;
 private:
+	uint32 currentStackFrameOffset = 0;
+	std::stack<std::unordered_map<std::string, uint32>> symbolTable; 
+
 	int start = 0;
 	int current = 0;
 	Runtime& runtime; 
@@ -45,7 +48,7 @@ private:
 	uptr<Expr> vardecl();
 	// Calls a function
 	uptr<Expr> funccall();
-	uptr<Expr> condition();
+
 	uptr<Unary> print();
 	void funcdecl();
 	void program();

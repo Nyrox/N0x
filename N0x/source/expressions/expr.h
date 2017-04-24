@@ -37,10 +37,11 @@ public:
 
 class VarDecl : public Expr {
 public:
-	VarDecl(std::string t_identifier, std::unique_ptr<Expr>&& init = nullptr);
+	VarDecl(std::string t_identifier, uint32 t_sfo, std::unique_ptr<Expr>&& init = nullptr);
 
 	void eval(Runtime& runtime, Block& scope) override;
 
+	uint32 stackFrameOffset = 0;
 	uptr<Expr> initializer = nullptr;;
 	std::string identifier;
 };
@@ -56,10 +57,11 @@ public:
 
 class Variable : public Expr {
 public:
-	Variable(std::string t_identifier);
+	Variable(std::string t_identifier, uint32 t_sfo);
 	void eval(Runtime& runtime, Block& block);
 
 	std::string identifier;
+	uint32 stackFrameOffset = 0;
 };
 
 class Unary : public Expr {
