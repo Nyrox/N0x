@@ -16,11 +16,7 @@ public:
 
 	friend class Interpreter;
 
-	void execute(Runtime& runtime) {
-		for (auto& it : expressions) {
-			it->eval(runtime, *this);
-		}
-	}
+	void execute(Runtime& runtime);
 
 	void defineVariable(std::string identifier, int initial = 0) {
 		variables[identifier] = initial;

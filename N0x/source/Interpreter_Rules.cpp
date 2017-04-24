@@ -1,4 +1,5 @@
 #include "Interpreter.h"
+#include <Runtime.h>
 
 Interpreter::Interpreter(Runtime& t_runtime, std::vector<Token> t_tokens) : runtime(t_runtime), tokens(t_tokens) { }
 
@@ -25,6 +26,29 @@ void Interpreter::funcdecl() {
 	runtime.functions[std::get<StringLiteral>(*identifier.literal).string] = std::move(block());
 }
 
+uptr<Expr> Interpreter::condition() {
+	advance(IF);
+
+	advance(LEFT_PAREN);
+	auto c = expr();
+	advance(RIGHT_PAREN);
+	auto b = block();
+
+	uptr<Expr> alternate = nullptr;
+	if (match(ELSE)) {
+		advance(ELSE);
+
+		if (match(IF)) {
+			alternate = condition();
+		}
+		else {
+			alternate = make_unique<BlockExpr>(block());
+		}
+	}
+
+	return make_unique<Condition>(std::move(c), std::move(b), std::move(alternate));
+}
+
 Block Interpreter::block() {
 	Token brace = advance(LEFT_BRACE);
 	Block out;
@@ -39,6 +63,9 @@ Block Interpreter::block() {
 			break;
 		case IDENTIFIER:
 			out.expressions.push_back(expr());
+			break;
+		case IF:
+			out.expressions.push_back(condition());
 			break;
 		default:
 			throw ParsingError("Unexpected symbol: " + peek().lexeme);
@@ -131,12 +158,6 @@ uptr<Expr> Interpreter::vardecl() {
 
 	return make_unique<VarDecl>(identifier, std::move(initializer));
 }
-
-uptr<Expr> Interpreter::identifier() {
-	Token token = advance(IDENTIFIER);
-	return make_unique<Variable>(std::get<StringLiteral>(*token.literal).string);
-}
-
 
 
 

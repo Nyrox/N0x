@@ -1,6 +1,25 @@
 #include "expr.h"
 #include <Runtime.h>
 
+
+/* If */
+void Condition::eval(Runtime& runtime, Block& scope) {
+	condition->eval(runtime, scope);
+
+	if (runtime.getRegister(Runtime::Registers::RETURN)) {
+		block.execute(runtime);
+	}
+	else if (alternate != nullptr) {
+		alternate->eval(runtime, scope);
+	}
+}
+
+/* Block */
+
+void BlockExpr::eval(Runtime& runtime, Block& scope) {
+	block.execute(runtime);
+}
+
 /* Var Decl */
 VarDecl::VarDecl(std::string t_identifier, std::unique_ptr<Expr>&& init) : identifier(t_identifier), initializer(std::move(init)) {
 

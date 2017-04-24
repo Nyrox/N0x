@@ -1,7 +1,8 @@
 #include <Scanner.h>
 #include <expressions/expr.h>
 #include <core/Definitions.h>
-#include <Runtime.h>
+class Runtime;
+
 
 class ParsingError : public std::exception {
 public:
@@ -44,7 +45,7 @@ private:
 	uptr<Expr> vardecl();
 	// Calls a function
 	uptr<Expr> funccall();
-
+	uptr<Expr> condition();
 	uptr<Unary> print();
 	void funcdecl();
 	void program();

@@ -18,6 +18,9 @@
     <ClCompile Include="source\main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="source\Runtime.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
     <ClCompile Include="source\Interpreter_Rules.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -29,21 +32,14 @@
     <ClInclude Include="source\Scanner.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="source\Runtime.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
     <ClInclude Include="source\Interpreter.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="source\expressions\expr.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="source\core\Definitions.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Runtime.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="scripts\main.nox" />
-    <None Include="grammar.cfg" />
   </ItemGroup>
 </Project>

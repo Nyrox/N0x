@@ -1,10 +1,7 @@
 #pragma once
 #include <Scanner.h>
 #include <core/Definitions.h>
-
-class Runtime;
-class Block;
-
+#include <Runtime.h>
 
 
 /* 
@@ -16,6 +13,26 @@ public:
 	Expr() { }
 
 	virtual void eval(Runtime&, Block&) = 0;
+};
+
+class BlockExpr : public Expr {
+public:
+	BlockExpr(Block&& t_block) : block(std::move(t_block)) { }
+
+	void eval(Runtime& runtime, Block& scope) override;
+
+	Block block;
+};
+
+class Condition : public Expr {
+public:
+	Condition(uptr<Expr>&& t_condition, Block&& t_block, uptr<Expr>&& t_alternate = nullptr) : alternate(std::move(t_alternate)), condition(std::move(t_condition)), block(std::move(t_block)) { }
+
+	void eval(Runtime& runtime, Block& scope) override;
+
+	uptr<Expr> condition = nullptr;
+	Block block;
+	uptr<Expr> alternate = nullptr;
 };
 
 class VarDecl : public Expr {
