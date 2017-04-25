@@ -13,7 +13,6 @@ void Interpreter::program() {
 	while (!endIsReached()) {
 		funcdecl();
 	}
-
 }
 
 void Interpreter::funcdecl() {

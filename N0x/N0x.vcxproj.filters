@@ -18,13 +18,16 @@
     <ClCompile Include="source\main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="source\Interpreter_Rules.cpp">
+    <ClCompile Include="source\parser\Parser_rules.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="source\expressions\expr.cpp">
+    <ClCompile Include="source\parser\Parser.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="source\Runtime.cpp">
+    <ClCompile Include="source\runtime\Runtime.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="source\parser\AST\ASTNode.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,19 +35,28 @@
     <ClInclude Include="source\Scanner.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="source\Interpreter.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="source\expressions\expr.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="source\core\Definitions.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="source\Runtime.h">
+    <ClInclude Include="source\core\FunctionDispatch.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="source\core\FunctionDispatch.h">
+    <ClInclude Include="source\parser\Parser.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\parser\AST\AST.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\parser\AST\ASTNode.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\parser\Exceptions\ParsingError.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\runtime\Runtime.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\runtime\ASTVisitor.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

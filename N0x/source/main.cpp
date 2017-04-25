@@ -1,5 +1,6 @@
-#include <Interpreter.h>
 #include <core/FunctionDispatch.h>
+#include <parser/Parser.h>
+#include <runtime/Runtime.h>
 
 int main() {
 
@@ -8,15 +9,19 @@ int main() {
 	std::string source = ss.str();
 
 	Scanner scanner(source);
+	/*Runtime runtime;*/
+	Parser parser(scanner.scanTokens());
+	auto ast = parser.parse();
+
+
+	//runtime.registerNativeFunction("cpp", make_unique<FunctionDispatch<void>>([&]() { 
+	//	std::cout << "Cpp!" << "\n";
+	//}));
+
+	//runtime.call("main");
+
 	Runtime runtime;
-	Interpreter interpreter(runtime, scanner.scanTokens());
-	interpreter.parse();
-
-	runtime.registerNativeFunction("cpp", make_unique<FunctionDispatch<void>>([&]() { 
-		std::cout << "Cpp!" << "\n";
-	}));
-
-	runtime.call("main");
+	runtime.eval(ast);
 
 
 	std::cin.get();
