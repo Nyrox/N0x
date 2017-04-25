@@ -20,9 +20,9 @@ int main() {
 
 	//runtime.call("main");
 
-	Runtime runtime;
+	Runtime runtime(256);
 	runtime.eval(ast);
-
+	runtime.call("main");
 
 	std::cin.get();
 }

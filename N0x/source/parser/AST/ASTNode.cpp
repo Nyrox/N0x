@@ -11,6 +11,18 @@ void FunctionDeclaration::visit(ASTVisitor& visitor) {
 	visitor.visit(*this);
 }
 
+void FunctionCall::visit(ASTVisitor& visitor) {
+	visitor.visit(*this);
+}
+
 void VariableDeclaration::visit(ASTVisitor& visitor) {
+	visitor.visit(*this);
+}
+
+void BinaryOperation::visit(ASTVisitor& visitor) {
+	visitor.visit(*this);
+}
+
+void Constant::visit(ASTVisitor& visitor) {
 	visitor.visit(*this);
 }

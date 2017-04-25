@@ -1,3 +1,8 @@
 func foo() {
-	var x
+
+}
+
+func main() {
+	var x = 5 * 3 + 4
+	foo()
 }

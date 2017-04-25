@@ -1,5 +1,3 @@
-#include "Interpreter.h"
-
 Interpreter::Interpreter(Runtime& t_runtime, std::vector<Token> t_tokens) : runtime(t_runtime), tokens(t_tokens) { 
 }
 

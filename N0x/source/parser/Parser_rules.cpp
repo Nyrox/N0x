@@ -55,6 +55,44 @@ uptr<ASTNode> Parser::vardeclaration() {
 }
 
 uptr<ASTNode> Parser::expression() {
+	auto node = term();
 
-	return nullptr;
+	while (match({ PLUS, MINUS })) {
+		Token token = advance();
+		node = make_unique<BinaryOperation>(std::move(node), token.type, term());
+	}
+
+	return std::move(node);
+}
+
+uptr<ASTNode> Parser::term() {
+	auto node = factor();
+
+	while (match({ STAR, SLASH })) {
+		Token token = advance();
+		node = make_unique<BinaryOperation>(std::move(node), token.type, factor());
+	}
+
+	return std::move(node);
+}
+
+uptr<ASTNode> Parser::factor() {
+	if (match({ INT })) {
+		Token token = advance();
+		return make_unique<Constant>(token.getIntLiteral());
+	}
+	else if (match(IDENTIFIER)) {
+		if (peekNext().type == LEFT_PAREN) {
+			return funccall();
+		}
+	}
+}
+
+uptr<ASTNode> Parser::funccall() {
+	Token token = advance(IDENTIFIER);
+
+	advance(LEFT_PAREN);
+	advance(RIGHT_PAREN);
+
+	return make_unique<FunctionCall>(token.getStringLiteral());
 }

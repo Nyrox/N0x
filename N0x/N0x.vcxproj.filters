@@ -30,6 +30,9 @@
     <ClCompile Include="source\parser\AST\ASTNode.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="source\runtime\Stack.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Scanner.h">
@@ -57,6 +60,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="source\runtime\ASTVisitor.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\runtime\Stack.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
