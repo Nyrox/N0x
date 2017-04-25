@@ -31,6 +31,16 @@ void VarDecl::eval(Runtime& runtime, Block& scope) {
 }
 
 
+
+/* Loop */
+void Loop::eval(Runtime& runtime, Block& scope) {
+	condition->eval(runtime, scope);
+
+	while (runtime.getRegister(Runtime::Registers::RETURN)) {
+		block.execute(runtime);
+	}
+}
+
 /* Func Call */
 FuncCall::FuncCall(std::string t_identifier) : identifier(t_identifier) {
 
@@ -42,6 +52,12 @@ void FuncCall::eval(Runtime& runtime, Block& block) {
 	runtime.popStackFrame();
 }
 
+/* VarAssignemnt */
+void VarAssignment::eval(Runtime& runtime, Block& scope) {
+	what->eval(runtime, scope);
+
+	*runtime.getPointerFromCurrentStackFrame<int>(offset) = runtime.getRegister(Runtime::Registers::RETURN);
+}
 
 /* Variable */
 Variable::Variable(std::string t_identifier, uint32 t_sfo) : stackFrameOffset(t_sfo), identifier(t_identifier) {

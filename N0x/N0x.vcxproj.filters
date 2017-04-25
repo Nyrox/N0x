@@ -18,21 +18,18 @@
     <ClCompile Include="source\main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="source\Runtime.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="source\Interpreter_Rules.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="source\expressions\expr.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="source\Runtime.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Scanner.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Runtime.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="source\Interpreter.h">
@@ -41,8 +38,18 @@
     <ClInclude Include="source\expressions\expr.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\Definitions.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Runtime.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
     <ClInclude Include="source\core\FunctionDispatch.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\main.nox" />
+    <None Include="grammar.cfg" />
   </ItemGroup>
 </Project>

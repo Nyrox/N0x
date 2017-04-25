@@ -47,6 +47,15 @@ Block Interpreter::block() {
 		case IDENTIFIER:
 			out.expressions.push_back(expr());
 			break;
+		case IF:
+			out.expressions.push_back(conditional());
+			break;
+		case WHILE:
+			out.expressions.push_back(loop());
+			break;
+		case FOR:
+			out.expressions.push_back(forLoop());
+			break;
 		default:
 			throw ParsingError("Unexpected symbol: " + peek().lexeme);
 		}
@@ -54,6 +63,46 @@ Block Interpreter::block() {
 
 	advance(RIGHT_BRACE);
 	return out;
+}
+
+uptr<Expr> Interpreter::forLoop() {
+	advance(FOR);
+
+	return nullptr;
+}
+
+uptr<Expr> Interpreter::loop() {
+	advance(WHILE);
+
+	advance(LEFT_PAREN);
+	auto c = expr();
+	advance(RIGHT_PAREN);
+	auto b = block();
+
+	return make_unique<Loop>(std::move(c), std::move(b));
+}
+
+uptr<Expr> Interpreter::conditional() {
+	advance(IF);
+
+	advance(LEFT_PAREN);
+	auto c = expr();
+	advance(RIGHT_PAREN);
+	auto b = block();
+
+	uptr<Expr> alternate = nullptr;
+	if (match(ELSE)) {
+		advance(ELSE);
+
+		if (match(IF)) {
+			alternate = conditional();
+		}
+		else {
+			alternate = make_unique<BlockExpr>(block());
+		}
+	}
+
+	return make_unique<Condition>(std::move(c), std::move(b), std::move(alternate));
 }
 
 uptr<Expr> Interpreter::expr() {
@@ -99,6 +148,9 @@ uptr<Expr> Interpreter::factor() {
 		if (peekNext().type == LEFT_PAREN) {
 			return funccall();
 		}
+		else if (peekNext().type == EQUAL) {
+			return varAssign();
+		}
 		else {
 			Token token = advance(IDENTIFIER);
 			std::string identifier = std::get<StringLiteral>(*token.literal).string;
@@ -108,6 +160,14 @@ uptr<Expr> Interpreter::factor() {
 	else {
 		throw ParsingError("Expected factor, found: " + getCurrent().lexeme);
 	}
+}
+
+uptr<Expr> Interpreter::varAssign() {
+	Token id = advance(IDENTIFIER);
+	advance(EQUAL);
+
+	auto what = expr();
+	return make_unique<VarAssignment>(symbolTable.top()[std::get<StringLiteral>(*id.literal).string], std::move(what));
 }
 
 uptr<Unary> Interpreter::print() {

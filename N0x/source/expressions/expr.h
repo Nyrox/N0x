@@ -35,6 +35,26 @@ public:
 	uptr<Expr> alternate = nullptr;
 };
 
+class Loop : public Expr {
+public:
+	Loop(uptr<Expr>&& t_condition, Block&& t_block) : condition(std::move(t_condition)), block(std::move(t_block)) { }
+
+	void eval(Runtime& runtime, Block& scope) override;
+
+	uptr<Expr> condition;
+	Block block;
+};
+
+class VarAssignment : public Expr {
+public:
+	VarAssignment(uint32 t_offset, uptr<Expr>&& t_what) : offset(t_offset), what(std::move(t_what)) { }
+
+	void eval(Runtime& runtime, Block& scope) override;
+
+	uptr<Expr> what;
+	uint32 offset;
+};
+
 class VarDecl : public Expr {
 public:
 	VarDecl(std::string t_identifier, uint32 t_sfo, std::unique_ptr<Expr>&& init = nullptr);

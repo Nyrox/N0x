@@ -48,6 +48,10 @@ private:
 	uptr<Expr> vardecl();
 	// Calls a function
 	uptr<Expr> funccall();
+	uptr<Expr> conditional();
+	uptr<Expr> loop();
+	uptr<Expr> varAssign();
+	uptr<Expr> forLoop();
 
 	uptr<Unary> print();
 	void funcdecl();

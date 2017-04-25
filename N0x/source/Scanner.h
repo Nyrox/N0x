@@ -15,7 +15,7 @@
 enum TokenType {
 	// Single character tokens
 	LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-	COMMA, DOT, MINUS, PLUS, SEMICOLON, COLON, SLASH, STAR, AMPERSAND,
+	COMMA, DOT, SEMICOLON, COLON, SLASH, STAR, AMPERSAND,
 
 
 	// One or two character tokens.
@@ -23,6 +23,8 @@ enum TokenType {
 	EQUAL, EQUAL_EQUAL,
 	GREATER, GREATER_EQUAL,
 	LESS, LESS_EQUAL,
+	PLUS, PLUS_PLUS,
+	MINUS, MINUS_MINUS,
 
 	// Literals.
 	IDENTIFIER, STRING, INT, FLOAT,
@@ -128,8 +130,6 @@ private:
 		case '}': addToken(RIGHT_BRACE); break;
 		case ',': addToken(COMMA); break;
 		case '.': addToken(DOT); break;
-		case '-': addToken(MINUS); break;
-		case '+': addToken(PLUS); break;
 		case ';': addToken(SEMICOLON); break;
 		case '*': addToken(STAR); break;
 			// 1 or 2 length characters
@@ -137,6 +137,8 @@ private:
 		case '=': addToken(match('=') ? EQUAL_EQUAL : EQUAL); break;
 		case '<': addToken(match('=') ? LESS_EQUAL : LESS); break;
 		case '>': addToken(match('=') ? GREATER_EQUAL : GREATER); break;
+		case '-': addToken(match('-') ? MINUS_MINUS : MINUS); break;
+		case '+': addToken(match('+') ? PLUS_PLUS : PLUS); break;
 			// Comment
 		case '/':
 			if (match('/')) {

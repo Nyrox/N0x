@@ -56,7 +56,12 @@ public:
 	// Get's a variable from an offset to the current stack frame
 	template<class T>
 	T getFromCurrentStackFrame(uint32 offset) {
-		return *(T*)(stackFrames.top() + offset);
+		return *getPointerFromCurrentStackFrame<T>(offset);
+	}
+
+	template<class T>
+	T* getPointerFromCurrentStackFrame(uint32 offset) {
+		return (T*)(stackFrames.top() + offset);
 	}
 
 	void pushStackFrame() {
