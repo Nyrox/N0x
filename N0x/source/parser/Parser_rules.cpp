@@ -37,7 +37,12 @@ uptr<ASTNode> Parser::statement() {
 	case VAR:
 		return vardeclaration();
 		break;
-		
+	case IDENTIFIER:
+		return expression();
+		break;
+	default:
+		throw ParsingError("Unexpected symbol: " + peek().lexeme);
+		break;
 	}
 }
 
@@ -86,6 +91,9 @@ uptr<ASTNode> Parser::factor() {
 			return funccall();
 		}
 	}
+
+
+	throw ParsingError("Unexpected symbol: " + peek().lexeme);
 }
 
 uptr<ASTNode> Parser::funccall() {

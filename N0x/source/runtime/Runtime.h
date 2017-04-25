@@ -24,7 +24,10 @@ public:
 	void eval(AST::AbstractSyntaxTree& ast);
 	void call(std::string function);
 
-	
+	void registerNativeFunction(std::string identifier, uptr<FunctionDispatch_Base> fun) {
+		nativeFunctions[identifier] = std::move(fun);
+	}
+
 	int getReturnRegister() { return registers[0]; }
 	void setReturnRegister(int i) { registers[0] = i; }
 

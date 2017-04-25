@@ -14,14 +14,16 @@ int main() {
 	auto ast = parser.parse();
 
 
-	//runtime.registerNativeFunction("cpp", make_unique<FunctionDispatch<void>>([&]() { 
-	//	std::cout << "Cpp!" << "\n";
-	//}));
-
-	//runtime.call("main");
-
+	
 	Runtime runtime(256);
+	runtime.registerNativeFunction("cpp", make_unique<FunctionDispatch<void>>([&]() {
+		std::cout << "Cpp!" << "\n";
+	}));
+
+
 	runtime.eval(ast);
+	
+	
 	runtime.call("main");
 
 	std::cin.get();

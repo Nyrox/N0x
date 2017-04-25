@@ -1,8 +1,9 @@
 func foo() {
-
+	var y = 7
 }
 
 func main() {
 	var x = 5 * 3 + 4
 	foo()
+	cpp()
 }
