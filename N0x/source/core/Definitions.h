@@ -5,7 +5,7 @@ template<class T>
 using uptr = std::unique_ptr<T>;
 using std::make_unique;
 
-
+using int32 = int32_t;
 using uint32 = uint32_t;
 
 

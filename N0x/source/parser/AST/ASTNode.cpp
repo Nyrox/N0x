@@ -15,6 +15,18 @@ void FunctionCall::visit(ASTVisitor& visitor) {
 	visitor.visit(*this);
 }
 
+void FunctionReturn::visit(ASTVisitor& visitor) {
+	visitor.visit(*this);
+}
+
+void Conditional::visit(ASTVisitor& visitor) {
+	visitor.visit(*this);
+}
+
+void Variable::visit(ASTVisitor& visitor) {
+	visitor.visit(*this);
+}
+
 void VariableDeclaration::visit(ASTVisitor& visitor) {
 	visitor.visit(*this);
 }

@@ -5,6 +5,7 @@
 #include <parser/AST/AST.h>
 #include <runtime/Runtime.h>
 #include <runtime/Stack.h>
+#include <runtime/BoxedValue.h>
 
 #include <unordered_map>
 #include <array>
@@ -15,11 +16,14 @@ public:
 	Runtime(uint32 stackSize) : stack(stackSize) {}
 
 	virtual void visit(AST::FunctionDeclaration&) override;
+	virtual void visit(AST::Variable&) override;
 	virtual void visit(AST::VariableDeclaration&) override;
 	virtual void visit(AST::Block&) override;
 	virtual void visit(AST::BinaryOperation&) override;
 	virtual void visit(AST::Constant&) override;
 	virtual void visit(AST::FunctionCall&) override;
+	virtual void visit(AST::FunctionReturn&) override;
+	virtual void visit(AST::Conditional&) override;
 
 	void eval(AST::AbstractSyntaxTree& ast);
 	void call(std::string function);
@@ -28,13 +32,16 @@ public:
 		nativeFunctions[identifier] = std::move(fun);
 	}
 
-	int getReturnRegister() { return registers[0]; }
-	void setReturnRegister(int i) { registers[0] = i; }
+	BoxedValue getReturnRegister() { return registers[0]; }
+	void setReturnRegister(BoxedValue i) { registers[0] = i; }
+
+	enum { NIL = 0, RETURNING } unwindFlag;
 
 	Stack stack;
 private:
-	std::array<int, 1> registers;
+	std::array<BoxedValue, 1> registers;
 
-	std::unordered_map<std::string, uptr<AST::Block>> noxFunctions;
+	std::stack<std::unordered_map<std::string, uint32>> symbolTable;
+	std::unordered_map<std::string, AST::FunctionDeclaration*> noxFunctions;
 	std::unordered_map<std::string, uptr<FunctionDispatch_Base>> nativeFunctions;
 };

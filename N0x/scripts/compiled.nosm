@@ -1,0 +1,45 @@
+func main() {
+	print(5)
+}
+
+main:
+	mov		%p1, $5
+	call	native print
+
+	ret
+------------------
+
+func foo(x) {
+	print(x)
+}
+
+func main() {
+	var x = 5
+	foo(x)
+}
+
+.foo:
+	mov		%ecs, %sp
+	mov		(%ecx + 8), (%bsp + 8)
+	mov		(%ecx + 4), %bsp
+	mov		%bsp, %sp
+	mov		%sp, %bsp + 8	
+	mov		(%ecx), %ip + 2
+	call	native print
+	ret
+
+.main:
+	// Allocate a variable and increment the stack pointer
+	mov		%(%bsp + 8), $5
+	mov		%eax, %sp
+	add		%eax, 8
+
+	// Prepare for func call
+	mov		%ecx, %sp
+	mov		(%ecx + 8), (%bsp + 8)
+	mov		(%ecx + 4), %bsp
+	mov		%bsp, %sp
+	mov		%sp, %bsp + 8
+	mov		(%ecx), %ip + 2
+	call	internal .foo
+	ret

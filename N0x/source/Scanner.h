@@ -31,7 +31,7 @@ enum TokenType {
 
 	// Keywords.
 	AND, CLASS, ELSE, FALSE, FUNC, FOR, IF, NIL, OR,
-	PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+	RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
 	END_OF_FILE
 };
@@ -307,7 +307,6 @@ private:
 		{ "func", FUNC },
 		{ "if", IF },
 		{ "null", NIL },
-		{ "print", PRINT },
 		{ "return", RETURN },
 		{ "this", THIS },
 		{ "true", TRUE },

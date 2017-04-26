@@ -24,9 +24,11 @@ public:
 
 	template<class T>
 	T* getRelativeToStackFrame(uint32 offset) {
-		return (T*)((T*)stackFrames.top() + offset);
+		return (T*)(stackFrames.top() + offset);
 	}
 
+	void dump();
+	uint32 getCurrentStackFrameOffset();
 	
 private:
 	char* stackPointer;

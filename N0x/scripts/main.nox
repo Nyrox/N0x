@@ -1,9 +1,8 @@
-func foo() {
-	var y = 7
-}
 
 func main() {
-	var x = 5 * 3 + 4
-	foo()
-	cpp()
+	var x = x * 2 + 5
+	var y = x * x
+
+	var z = x / y
+	var a = fib(10)
 }

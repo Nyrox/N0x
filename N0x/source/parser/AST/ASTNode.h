@@ -29,6 +29,7 @@ namespace AST {
 
 		std::string identifier;
 		uptr<Block> block;
+		std::vector<std::string> params;
 	};
 
 	class FunctionCall : public ASTNode {
@@ -40,6 +41,27 @@ namespace AST {
 		virtual void visit(ASTVisitor& visitor) override;
 
 		std::string identifier;
+		std::vector<uptr<ASTNode>> params;
+	};
+
+	class Variable : public ASTNode {
+	public:
+		Variable(std::string t_identifier) : identifier(t_identifier) { }
+
+		virtual void visit(ASTVisitor& visitor) override;
+
+		std::string identifier;
+	};
+
+	class FunctionReturn : public ASTNode {
+	public:
+		FunctionReturn(uptr<ASTNode>&& t_expr) : expression(std::move(t_expr)) {
+
+		}
+
+		virtual void visit(ASTVisitor& visitor) override;
+
+		uptr<ASTNode> expression;
 	};
 
 	class VariableDeclaration : public ASTNode {
@@ -52,6 +74,16 @@ namespace AST {
 
 		std::string identifier;
 		uptr<ASTNode> initializer;
+	};
+
+	class Conditional : public ASTNode {
+	public:
+		Conditional(uptr<ASTNode>&& t_condition, uptr<ASTNode>&& t_consequent, uptr<ASTNode>&& t_alternate)
+			: condition(std::move(t_condition)), consequent(std::move(t_consequent)), alternate(std::move(t_alternate)) { }
+	
+		virtual void visit(ASTVisitor& visitor) override;
+
+		uptr<ASTNode> consequent, alternate, condition;
 	};
 
 	class BinaryOperation : public ASTNode {

@@ -5,8 +5,11 @@ class ASTVisitor {
 public:
 	virtual void visit(AST::Block&) = 0;
 	virtual void visit(AST::FunctionDeclaration&) = 0;
+	virtual void visit(AST::Variable&) = 0;
 	virtual void visit(AST::VariableDeclaration&) = 0;
 	virtual void visit(AST::BinaryOperation&) = 0;
 	virtual void visit(AST::Constant&) = 0;
 	virtual void visit(AST::FunctionCall&) = 0;
+	virtual void visit(AST::FunctionReturn&) = 0;
+	virtual void visit(AST::Conditional&) = 0;
 };

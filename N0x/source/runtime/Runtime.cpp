@@ -10,57 +10,106 @@ void Runtime::eval(AbstractSyntaxTree& ast) {
 }
 
 void Runtime::call(std::string identifier) {
-	this->noxFunctions[identifier]->visit(*this);
+	FunctionCall(identifier).visit(*this);
 }
 
 void Runtime::visit(AST::FunctionDeclaration& node) {
-	std::cout << "Declaring function: " << node.identifier << "\n";
-
-	noxFunctions[node.identifier] = std::move(node.block);
+	noxFunctions[node.identifier] = &node;
 }
 
 void Runtime::visit(AST::FunctionCall& node) {
-	std::cout << "Calling function: " << node.identifier << "\n";
-
 	if (noxFunctions.find(node.identifier) != noxFunctions.end()) {
-		noxFunctions[node.identifier]->visit(*this);
+		auto& func = noxFunctions[node.identifier];
+
+		if (func->params.size() != node.params.size()) {
+			throw "Function mismatch";
+		}
+
+		// Buffer all the parameters
+		std::vector<BoxedValue> params;
+		for (auto& it : node.params) {
+			it->visit(*this);
+			params.push_back(getReturnRegister());
+		}
+
+		symbolTable.push({});
+		stack.pushStackFrame();
+
+		for (int i = 0; i < node.params.size(); i++) {
+			symbolTable.top()[func->params[i]] = stack.getCurrentStackFrameOffset();
+			stack.push<BoxedValue>(params[i]);
+		}
+
+		func->block->visit(*this);
+		if (unwindFlag == RETURNING) unwindFlag = NIL;
+
+		symbolTable.pop();
+		stack.popStackFrame();
 	}
-	else if(nativeFunctions.find(node.identifier) != nativeFunctions.end()) {
-		nativeFunctions[node.identifier]->invoke(nullptr);
+	else if (nativeFunctions.find(node.identifier) != nativeFunctions.end()) {
+		auto& func = nativeFunctions[node.identifier];
+
+		if (func->getParamCount() != node.params.size()) {
+			throw "Function mismatch";
+		}
+
+		std::vector<BoxedValue::PureValue> params;
+		for (auto& it : node.params) {
+			it->visit(*this);
+			params.push_back(getReturnRegister());
+		}
+		
+		nativeFunctions[node.identifier]->invoke((void*)params.data());
 	}
 }
 
+void Runtime::visit(AST::FunctionReturn& node) {
+	node.expression->visit(*this);
+	unwindFlag = RETURNING;
+}
+
+void Runtime::visit(AST::Conditional& node) {
+	node.condition->visit(*this);
+
+	if (getReturnRegister()) {
+		node.consequent->visit(*this);
+	}
+	else {
+		node.alternate->visit(*this);
+	}
+}
+
+void Runtime::visit(AST::Variable& node) {
+	setReturnRegister(*stack.getRelativeToStackFrame<int>(symbolTable.top()[node.identifier]));
+}
+
 void Runtime::visit(AST::VariableDeclaration& node) {
-	std::cout << "Declaring variable: " << node.identifier << "\n";
-	
+	symbolTable.top()[node.identifier] = stack.getCurrentStackFrameOffset();
+
 	if (node.initializer) {
 		node.initializer->visit(*this);
 		stack.push(getReturnRegister());
+		//std::cout << "Declaring variable " << node.identifier << " with: " << getReturnRegister() << "\n";
 	}
 	else {
 		stack.push(0);
 	}
+
+	
 }
 
 void Runtime::visit(AST::Block& node) {
-	std::cout << "Beginning new block." << "\n";
-
 	for (auto& it : node.statements) {
+		if (unwindFlag == RETURNING) return;
 		it->visit(*this);
 	}
-
-	std::cout << "Ending block." << "\n";
 }
 
 void Runtime::visit(AST::Constant& node) {
-	std::cout << "Encountered constant: " << node.value << "\n";
-
 	setReturnRegister(node.value);
 }
 
 void Runtime::visit(AST::BinaryOperation& node) {
-	std::cout << "Encountered binary operation: " << node.op << "\n";
-
 	node.left->visit(*this);
 	int left = getReturnRegister();
 
@@ -79,6 +128,18 @@ void Runtime::visit(AST::BinaryOperation& node) {
 		break;
 	case STAR:
 		setReturnRegister(left * right);
+		break;
+	case LESS:
+		setReturnRegister(left < right);
+		break;
+	case GREATER:
+		setReturnRegister(left > right);
+		break;
+	case GREATER_EQUAL:
+		setReturnRegister(left >= right);
+		break;
+	case LESS_EQUAL:
+		setReturnRegister(left <= right);
 		break;
 	}
 }

@@ -65,9 +65,13 @@
     <ClInclude Include="source\runtime\Stack.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="source\runtime\BoxedValue.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\main.nox" />
     <None Include="grammar.cfg" />
+    <None Include="scripts\compiled.nosm" />
   </ItemGroup>
 </Project>

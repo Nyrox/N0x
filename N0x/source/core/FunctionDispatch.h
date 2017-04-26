@@ -5,6 +5,7 @@
 class FunctionDispatch_Base {
 public:
 	virtual void invoke(void*) = 0;
+	virtual uint32 getParamCount() const = 0;
 };
 
 template<class T, class... P>
@@ -12,7 +13,9 @@ class FunctionDispatch : public FunctionDispatch_Base {
 public:
 	FunctionDispatch(std::function<T(P...)> t_ptr) : ptr(t_ptr) { }
 
-
+	virtual uint32 getParamCount() const override {
+		return sizeof...(P);
+	}
 
 	virtual void invoke(void* mem) override {
 		invoke<sizeof...(P)>(mem);

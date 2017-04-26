@@ -45,5 +45,6 @@ private:
 	uptr<AST::ASTNode> expression();
 	uptr<AST::ASTNode> term();
 	uptr<AST::ASTNode> factor();
+	uptr<AST::ASTNode> funcreturn();
 
 };
