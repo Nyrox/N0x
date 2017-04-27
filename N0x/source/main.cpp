@@ -21,7 +21,7 @@ int main() {
 		std::cout << "Cpp!" << "\n";
 	}));
 
-	runtime.registerNativeFunction("print", make_unique<FunctionDispatch<void, int>>([&](int i) {
+	runtime.registerNativeFunction("print", make_unique<FunctionDispatch<void, float>>([&](float i) {
 		std::cout << i << "\n";
 	}));
 
@@ -31,7 +31,7 @@ int main() {
 	high_resolution_clock clock;
 	auto start = clock.now();
 
-	for (int i = 0; i < 60; i++) {
+	for (int i = 0; i < 1; i++) {
 		runtime.call("main");
 	}
 

@@ -148,7 +148,11 @@ uptr<ASTNode> Parser::term() {
 uptr<ASTNode> Parser::factor() {
 	if (match({ INT })) {
 		Token token = advance();
-		return make_unique<Constant>(token.getIntLiteral());
+		return make_unique<Constant>(BoxedValue(token.getIntLiteral()));
+	}
+	else if (match({ FLOAT })) {
+		Token token = advance();
+		return make_unique<Constant>(BoxedValue(token.getFloatLiteral()));
 	}
 	else if (match(IDENTIFIER)) {
 		if (peekNext().type == LEFT_PAREN) {
@@ -157,6 +161,15 @@ uptr<ASTNode> Parser::factor() {
 		else {
 			return make_unique<Variable>(advance().getStringLiteral());
 		}
+	}
+	else if (match(LEFT_PAREN)) {
+		advance(LEFT_PAREN);
+
+		auto out = expression();
+
+		advance(RIGHT_PAREN);
+
+		return std::move(out);
 	}
 
 

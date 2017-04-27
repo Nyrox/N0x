@@ -3,57 +3,146 @@
 #include <cassert>
 
 struct BoxedValue {
-	BoxedValue() : type(TYPE_VOID) {}
-	explicit BoxedValue(int t_i) { setValue(t_i); }
-	explicit BoxedValue(float t_f) { setValue(t_f); }
-
-	/*BoxedValue promote_to_common(BoxedValue o) {
-		if (type == o.type)
-			return *this;
-
-		if (type == TYPE_VOID)
-			assert(false);
-
-		switch (o.type) {
-		case TYPE_VOID: assert(false);
-
-		case TYPE_F32: switch (type) {
-		case TYPE_U32: return BoxedValue{ (float)d.u32 };
-		case TYPE_U64: return BoxedValue{ (float)d.u64 };
-		default: assert(false);
-		}
-
-		case TYPE_U32: switch (type) {
-		case TYPE_F32: return *this;
-		case TYPE_U64: return *this;
-		default: assert(false);
-		}
-
-		case TYPE_U64: switch (type) {
-		case TYPE_U32: return BoxedValue{ (uint64_t)d.u32 };
-		case TYPE_F32: return *this;
-		default: assert(false);
-		}
-		}
-	}*/
-
-	BoxedValue operator+(BoxedValue& other) {
-		switch (type) {
-		case INT:
-			return BoxedValue(value.i + other.value.i);
-		case FLOAT:
-			return BoxedValue(value.f + other.value.f);
-		}
-
-	}
-
-	void setValue(int val) { value.i = val; type = INT; }
-	void setValue(float val) { value.f = val; type = FLOAT; }
-
 	union PureValue {
 		int32 i32;
 		float f32;
 	};
+
+	BoxedValue() : type(TYPE_VOID) {}
+	BoxedValue(const BoxedValue&) = default;
+	BoxedValue(BoxedValue&&) = default;
+	BoxedValue& operator=(const BoxedValue&) = default;
+	BoxedValue& operator=(BoxedValue&&) = default;
+
+	explicit BoxedValue(int t_i) { setValue(t_i); }
+	explicit BoxedValue(float t_f) { setValue(t_f); }
+
+	BoxedValue promote_to_common(BoxedValue& o) {
+		if (type == o.type) return *this;
+
+		if (o.type == TYPE_VOID) assert(FALSE);
+	
+		switch (o.type) {
+		case TYPE_F32:
+			if (type == TYPE_I32) return BoxedValue((float)value.i32);
+			else return *this;
+		case TYPE_I32:
+			return *this;
+		}
+	}
+
+	operator bool() const {
+		switch (type) {
+		case TYPE_I32:
+			return value.i32;
+		case TYPE_F32:
+			return value.f32;
+		}
+	}
+
+	BoxedValue operator+(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 + right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 + right.value.f32);
+		}
+	}
+
+	BoxedValue operator-(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 - right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 - right.value.f32);
+		}
+	}
+
+	BoxedValue operator*(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 * right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 * right.value.f32);
+		}
+	}
+
+	BoxedValue operator/(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 / right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 / right.value.f32);
+		}
+	}
+
+	BoxedValue operator<(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 < right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 < right.value.f32);
+		}
+	}
+
+	BoxedValue operator>(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 > right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 > right.value.f32);
+		}
+	}
+
+	BoxedValue operator<=(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 <= right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 <= right.value.f32);
+		}
+	}
+
+	BoxedValue operator>=(BoxedValue& right) {
+		const auto left = promote_to_common(right);
+		right = right.promote_to_common(*this);
+
+		switch (left.type) {
+		case TYPE_I32:
+			return BoxedValue(left.value.i32 >= right.value.i32);
+		case TYPE_F32:
+			return BoxedValue(left.value.f32 >= right.value.f32);
+		}
+	}
+
+
+	PureValue getPureValue() { return value; }
+
+	void setValue(int val) { value.i32 = val; type = TYPE_I32; }
+	void setValue(float val) { value.f32 = val; type = TYPE_F32; }
+
+	
 private:	
 	PureValue value;
 	enum Type {

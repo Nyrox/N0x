@@ -80,6 +80,10 @@ struct Token {
 		return std::get<IntegerLiteral>(*literal).value;
 	}
 
+	float getFloatLiteral() {
+		return std::get<FloatLiteral>(*literal).value;
+	}
+
 	TokenType type;
 	std::string lexeme;
 	int line;

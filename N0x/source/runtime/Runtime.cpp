@@ -46,6 +46,8 @@ void Runtime::visit(AST::FunctionCall& node) {
 		symbolTable.pop();
 		stack.popStackFrame();
 	}
+
+	// Native functions
 	else if (nativeFunctions.find(node.identifier) != nativeFunctions.end()) {
 		auto& func = nativeFunctions[node.identifier];
 
@@ -56,7 +58,7 @@ void Runtime::visit(AST::FunctionCall& node) {
 		std::vector<BoxedValue::PureValue> params;
 		for (auto& it : node.params) {
 			it->visit(*this);
-			params.push_back(getReturnRegister());
+			params.push_back(getReturnRegister().getPureValue());
 		}
 		
 		nativeFunctions[node.identifier]->invoke((void*)params.data());
@@ -80,7 +82,7 @@ void Runtime::visit(AST::Conditional& node) {
 }
 
 void Runtime::visit(AST::Variable& node) {
-	setReturnRegister(*stack.getRelativeToStackFrame<int>(symbolTable.top()[node.identifier]));
+	setReturnRegister(*stack.getRelativeToStackFrame<BoxedValue>(symbolTable.top()[node.identifier]));
 }
 
 void Runtime::visit(AST::VariableDeclaration& node) {
@@ -111,10 +113,10 @@ void Runtime::visit(AST::Constant& node) {
 
 void Runtime::visit(AST::BinaryOperation& node) {
 	node.left->visit(*this);
-	int left = getReturnRegister();
+	BoxedValue left = getReturnRegister();
 
 	node.right->visit(*this);
-	int right = getReturnRegister();
+	BoxedValue right = getReturnRegister();
 
 	switch (node.op) {
 	case PLUS:

@@ -4,6 +4,7 @@
 #include <core/Definitions.h>
 #include <string>
 #include <vector>
+#include <runtime/BoxedValue.h>
 
 class ASTVisitor;
 
@@ -101,12 +102,12 @@ namespace AST {
 
 	class Constant : public ASTNode {
 	public:
-		Constant(int t_value) : value(t_value) {
+		Constant(BoxedValue t_value) : value(t_value) {
 
 		}
 
 		virtual void visit(ASTVisitor& visitor) override;
 
-		int value;
+		BoxedValue value;
 	};
 }
