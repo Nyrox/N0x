@@ -55,13 +55,13 @@ void Runtime::visit(AST::FunctionCall& node) {
 			throw "Function mismatch";
 		}
 
-		std::vector<BoxedValue::PureValue> params;
+		std::vector<BoxedValue> params;
 		for (auto& it : node.params) {
 			it->visit(*this);
-			params.push_back(getReturnRegister().getPureValue());
+			params.push_back(getReturnRegister());
 		}
 		
-		nativeFunctions[node.identifier]->invoke((void*)params.data());
+		nativeFunctions[node.identifier]->invoke(params);
 	}
 }
 
@@ -91,14 +91,13 @@ void Runtime::visit(AST::VariableDeclaration& node) {
 	if (node.initializer) {
 		node.initializer->visit(*this);
 		stack.push(getReturnRegister());
-		//std::cout << "Declaring variable " << node.identifier << " with: " << getReturnRegister() << "\n";
 	}
 	else {
 		stack.push(0);
 	}
-
-	
+		
 }
+
 
 void Runtime::visit(AST::Block& node) {
 	for (auto& it : node.statements) {

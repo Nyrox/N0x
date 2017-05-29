@@ -1,10 +1,12 @@
 #pragma once
 #include <core/Definitions.h>
 #include <functional>
+#include <runtime/BoxedValue.h>
+#include <vector>
 
 class FunctionDispatch_Base {
 public:
-	virtual void invoke(void*) = 0;
+	virtual void invoke(std::vector<BoxedValue> value) = 0;
 	virtual uint32 getParamCount() const = 0;
 };
 
@@ -17,37 +19,37 @@ public:
 		return sizeof...(P);
 	}
 
-	virtual void invoke(void* mem) override {
-		invoke<sizeof...(P)>(mem);
+	virtual void invoke(std::vector<BoxedValue> params) override {
+		invoke<sizeof...(P)>(params);
 	}
 
 private:
 	template<int pc>
-	void invoke(void* mem) {
+	void invoke(std::vector<BoxedValue> params) {
 		ptr();
 	}
 
 	template<>
-	void invoke<1>(void* mem) {
+	void invoke<1>(std::vector<BoxedValue> params) {
 		using t1 = NthTypeOf<0, P...>;
-		ptr(*(t1*)(mem));
+		ptr((t1)params[0]);
 	}
 
 	template<>
-	void invoke<2>(void* mem) {
+	void invoke<2>(std::vector<BoxedValue> params) {
 		using t1 = NthTypeOf<0, P...>;
 		using t2 = NthTypeOf<1, P...>;
 
-		ptr(*(t1*)(mem), *((t2*)(mem)+sizeof(t1)));
+		ptr((t1)params[0], (t2)params[1]);
 	}
 
 	template<>
-	void invoke<3>(void* mem) {
+	void invoke<3>(std::vector<BoxedValue> params) {
 		using t1 = NthTypeOf<0, P...>;
 		using t2 = NthTypeOf<1, P...>;
 		using t3 = NthTypeOf<2, P...>;
 
-		ptr(*(t1*)(mem), *((t2*)(mem)+sizeof(t1)), *((t3*)(mem)+sizeof(t1) + sizeof(t2)));
+		ptr((t1)params[0], (t2)params[1], (t3)params[2]);
 	}
 
 	std::function<T(P...)> ptr;

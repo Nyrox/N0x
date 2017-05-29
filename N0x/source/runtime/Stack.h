@@ -34,4 +34,5 @@ private:
 	char* stackPointer;
 	char* stackEnd;
 	std::stack<char*> stackFrames;
+
 };

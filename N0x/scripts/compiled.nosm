@@ -1,45 +1,17 @@
-func main() {
-	print(5)
-}
-
-main:
-	mov		%p1, $5
-	call	native print
-
-	ret
-------------------
-
-func foo(x) {
-	print(x)
-}
-
-func main() {
-	var x = 5
-	foo(x)
-}
-
-.foo:
-	mov		%ecs, %sp
-	mov		(%ecx + 8), (%bsp + 8)
-	mov		(%ecx + 4), %bsp
-	mov		%bsp, %sp
-	mov		%sp, %bsp + 8	
-	mov		(%ecx), %ip + 2
-	call	native print
-	ret
-
+// IR (maybe not neccesary? dunno)
 .main:
-	// Allocate a variable and increment the stack pointer
-	mov		%(%bsp + 8), $5
-	mov		%eax, %sp
-	add		%eax, 8
+	// Constants resolved
+	float x = 8.25
+	float y = x * x
+	call_extern print y
+	return
 
-	// Prepare for func call
-	mov		%ecx, %sp
-	mov		(%ecx + 8), (%bsp + 8)
-	mov		(%ecx + 4), %bsp
-	mov		%bsp, %sp
-	mov		%sp, %bsp + 8
-	mov		(%ecx), %ip + 2
-	call	internal .foo
-	ret
+// Compiles into (human readable form)
+.main:
+	push 8.25
+	push mul $0x00 $0x00
+
+	// call_extern name [bytes to copy, memory locations to copy from]
+	call_extern print 0x20 $0x20
+
+

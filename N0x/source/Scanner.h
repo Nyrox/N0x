@@ -266,7 +266,7 @@ private:
 		advance();
 
 		// Trim the surrounding quotes
-		std::string value = source.substr(start + 1, current - start - 1);
+		std::string value = source.substr(start + 1, (current - start) - 2);
 		addToken(STRING, StringLiteral(value));
 	}
 

@@ -1,8 +1,18 @@
+func fib(n) {
+	if(n <= 1){
+		return n
+	}
+	var fibo = 1
+	var fiboPrev = 1
+	var(var i = 2; i < n; ++i){
+		var temp = fibo
+		fibo += fiboPrev
+		fiboPrev = temp
+	}
+	return fibo
+}
 
 func main() {
-	var x = (5.5 * 3) / 2
-	var y = x * x
-
-
-	print(x)
+	print(fib(40))
+	
 }

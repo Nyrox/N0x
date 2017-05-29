@@ -1,6 +1,7 @@
 #pragma once
 #include <core/Definitions.h>
 #include <cassert>
+#include <string>
 
 struct BoxedValue {
 	union PureValue {
@@ -20,7 +21,7 @@ struct BoxedValue {
 	BoxedValue promote_to_common(BoxedValue& o) {
 		if (type == o.type) return *this;
 
-		if (o.type == TYPE_VOID) assert(FALSE);
+		if (o.type == TYPE_VOID) assert(false);
 	
 		switch (o.type) {
 		case TYPE_F32:
@@ -38,6 +39,17 @@ struct BoxedValue {
 		case TYPE_F32:
 			return value.f32;
 		}
+	}
+
+	operator std::string() const {
+		switch (type) {
+		case TYPE_I32:
+			return std::to_string(value.i32);
+		case TYPE_F32:
+			return std::to_string(value.f32);
+		}
+
+		assert(false);
 	}
 
 	BoxedValue operator+(BoxedValue& right) {
