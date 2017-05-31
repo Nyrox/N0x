@@ -410,7 +410,7 @@ int main() {
 		}
 	}
 	auto end = clock.now();
-	auto elapsed_seconds = end - start;
+	duration<double> elapsed_seconds = end - start;
 	std::cout << "Finished computation in " << elapsed_seconds.count() << " seconds." << "\n";
 
 

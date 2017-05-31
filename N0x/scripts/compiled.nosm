@@ -29,7 +29,7 @@ Function table:
 print = 0
 */
 
-.fib
+.fib<int>
 	PUSH_STACK 0x12, UNDEFINED;
 	MOV SPTR 0x04, CONST 1;
 	MOV SPTR 0x08, CONST 1;
