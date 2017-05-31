@@ -1,4 +1,5 @@
 #pragma once
+#include <core/Definitions.h>
 
 #include <iostream>
 #include <fstream>
@@ -12,10 +13,13 @@
 #include <tuple>
 #include <unordered_map>
 
+using namespace std::literals::string_literals;
+
 enum TokenType {
 	// Single character tokens
-	LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-	COMMA, DOT, SEMICOLON, COLON, SLASH, STAR, AMPERSAND,
+	LEFT_PAREN = 2001, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
+	COMMA, DOT, SEMICOLON, COLON, SLASH, STAR, AMPERSAND, 
+	DOLLAR, PERCENT,
 
 
 	// One or two character tokens.
@@ -62,9 +66,9 @@ using Literal = std::variant<StringLiteral, IntegerLiteral, FloatLiteral>;
 
 struct Token {
 
-	explicit Token(TokenType t_type, std::string t_lexeme, int t_line) : type(t_type), lexeme(t_lexeme), line(t_line) { }
+	explicit Token(uint32 t_type, std::string t_lexeme, int t_line) : type(t_type), lexeme(t_lexeme), line(t_line) { }
 	// String literal
-	explicit Token(TokenType t_type, std::string t_lexeme, int t_line, Literal t_literal) : Token(t_type, t_lexeme, t_line) {
+	explicit Token(uint32 t_type, std::string t_lexeme, int t_line, Literal t_literal) : Token(t_type, t_lexeme, t_line) {
 		literal = t_literal;
 	}
 
@@ -84,7 +88,7 @@ struct Token {
 		return std::get<FloatLiteral>(*literal).value;
 	}
 
-	TokenType type;
+	uint32 type;
 	std::string lexeme;
 	int line;
 
@@ -127,6 +131,8 @@ public:
 
 	std::string source;
 	std::vector<Token> tokens;
+
+	std::unordered_map<std::string, uint32> keywords;
 private:
 	int start = 0;
 	int current = 0;
@@ -144,6 +150,9 @@ private:
 		case '.': addToken(DOT); break;
 		case ';': addToken(SEMICOLON); break;
 		case '*': addToken(STAR); break;
+		case '$': addToken(DOLLAR); break;
+		case '%': addToken(PERCENT); break;
+
 			// 1 or 2 length characters
 		case '!': addToken(match('=') ? BANG_EQUAL : BANG); break;
 		case '=': addToken(match('=') ? EQUAL_EQUAL : EQUAL); break;
@@ -156,10 +165,16 @@ private:
 			if (match('/')) {
 				while (peek() != '\n' && !endIsReached()) advance();
 			}
+			else if (match('*')) {
+				while ((peek() != '*' || peekNext() != '/') && !endIsReached()) {
+					if(advance() == '\n') line++;
+				}
+			}
 			else {
 				addToken(SLASH);
 			}
 			break;
+			
 			// String literals
 		case '"': string(); break;
 
@@ -186,7 +201,7 @@ private:
 
 
 			// Error unrecognized token
-			throw LexicalError(line, "Invalid token");
+			throw LexicalError(line, "Invalid token: "s + c);
 			break;
 		}
 	}
@@ -244,7 +259,7 @@ private:
 		// See if the identifier is reserved
 		std::string text = source.substr(start, current - start);
 		auto it = keywords.find(text);
-		TokenType type = IDENTIFIER;
+		uint32 type = IDENTIFIER;
 		if (it != keywords.end()) type = keywords.at(text);
 		addToken(type, StringLiteral(text));
 	}
@@ -291,30 +306,17 @@ private:
 	}
 
 	// Add's a token without literal
-	void addToken(TokenType type) {
+	void addToken(uint32 type) {
 		std::string text = source.substr(start, current - start);
 		tokens.push_back(Token(type, text, line));
 	}
 
 	// Adds a token with literal
-	void addToken(TokenType type, Literal literal) {
+	void addToken(uint32 type, Literal literal) {
 		std::string text = source.substr(start, current - start);
 		tokens.push_back(Token(type, text, line, literal));
 	}
 
 
-	const std::unordered_map<std::string, TokenType> keywords = {
-		{ "class", CLASS },
-		{ "else", ELSE },
-		{ "false", FALSE },
-		{ "for", FOR },
-		{ "func", FUNC },
-		{ "if", IF },
-		{ "null", NIL },
-		{ "return", RETURN },
-		{ "this", THIS },
-		{ "true", TRUE },
-		{ "var", VAR },
-		{ "while", WHILE }
-	};
+
 };

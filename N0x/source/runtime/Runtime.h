@@ -37,7 +37,7 @@ public:
 
 	enum { NIL = 0, RETURNING } unwindFlag;
 
-	Stack stack;
+	SStack stack;
 private:
 	std::array<BoxedValue, 1> registers;
 

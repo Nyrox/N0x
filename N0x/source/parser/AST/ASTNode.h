@@ -89,7 +89,7 @@ namespace AST {
 
 	class BinaryOperation : public ASTNode {
 	public:
-		BinaryOperation(uptr<ASTNode>&& t_left, TokenType t_op, uptr<ASTNode>&& t_right) : left(std::move(t_left)), right(std::move(t_right)), op(t_op) {
+		BinaryOperation(uptr<ASTNode>&& t_left, uint32 t_op, uptr<ASTNode>&& t_right) : left(std::move(t_left)), right(std::move(t_right)), op(t_op) {
 
 		}
 
@@ -97,7 +97,7 @@ namespace AST {
 
 
 		uptr<ASTNode> left, right;
-		TokenType op;
+		uint32 op;
 	};
 
 	class Constant : public ASTNode {

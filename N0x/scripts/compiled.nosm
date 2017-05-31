@@ -1,17 +1,55 @@
-// IR (maybe not neccesary? dunno)
-.main:
-	// Constants resolved
-	float x = 8.25
-	float y = x * x
-	call_extern print y
-	return
+/* 
+Bytecode specification:
 
-// Compiles into (human readable form)
-.main:
-	push 8.25
-	push mul $0x00 $0x00
-
-	// call_extern name [bytes to copy, memory locations to copy from]
-	call_extern print 0x20 $0x20
+PUSH_STACK bytes:uint initFlags:enum :
+Pushes [bytes] bytes onto the stack and initializes them based on initFlags.
+Possible initFlags:
+UNDEFINED - Memory will be whatever there was before at that memory location
+NULL - Memory will be nulled out 
 
 
+PUSH_PARAM:
+Pushes a param at the beginning of the next stack frame.
+It should be noted that any allocations on the current stack frame after a PUSH_PARAM call and before a CALL_* are undefined behaviour
+and can lead to anything between crashes and "Format C: " (Not really though)
+*/
+
+
+/*
+Stack table:
+fib = 0x00
+fibPrev = 0x04
+i = 0x08
+temp = 0x0B
+
+Label table:
+.loop = 0
+
+Function table:
+print = 0
+*/
+
+.fib
+	PUSH_STACK 0x12, UNDEFINED;
+	MOV SPTR 0x04, CONST 1;
+	MOV SPTR 0x08, CONST 1;
+	MOV SPTR 0x0C, CONST 2;
+
+	// Main loop
+	.l0 
+		MOV		SPTR 0x10, SPTR 0x04;
+		IADD	SPTR 0x04, SPTR 0x08;
+		MOV		SPTR 0x08, SPTR 0x10;
+		IADD	SPTR 0x0C, CONST 1;
+		ILESS	SPTR 0x0C, SPTR 0x00;
+		JMP_IF	%bool, l0;
+
+	MOV %eax, SPTR 0x04;
+	RET;
+
+.main
+	PUSH_PARAM 0x04, CONST 60;
+	CALL fib;
+
+	PUSH_PARAM 0x04, %eax;
+	CALL_EXT print;

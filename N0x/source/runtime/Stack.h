@@ -2,10 +2,10 @@
 #include <core/Definitions.h>
 #include <stack>
 
-class Stack {
+class SStack {
 public:
-	Stack(uint32 stackSize);
-	~Stack();
+	SStack(uint32 stackSize);
+	~SStack();
 
 	template<class T>
 	void push(T val) {

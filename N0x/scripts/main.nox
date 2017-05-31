@@ -1,15 +1,5 @@
 func fib(n) {
-	if(n <= 1){
-		return n
-	}
-	var fibo = 1
-	var fiboPrev = 1
-	var(var i = 2; i < n; ++i){
-		var temp = fibo
-		fibo += fiboPrev
-		fiboPrev = temp
-	}
-	return fibo
+	
 }
 
 func main() {
